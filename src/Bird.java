@@ -1,22 +1,22 @@
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.util.Timer;
+
 
 public class Bird{
     public boolean spacePressed;
     private final double x;
-    private double y, yvel;
-    private final double gravity;
+    private double y;
+    private final double gravity, yvel;
     private final Frame frame;
 
 
     public Bird(Frame frame) {
         this.spacePressed = false;
         this.frame = frame;
-        this.x = frame.getWidth()/3.0;
+        this.x = frame.getWidth()/3.0 - 40;
         this.y = frame.getHeight()/3.0;
-        this.gravity = 0.2;
-        this.yvel = 0.0001;
+        this.gravity = 0.4;
+        this.yvel = 0.003;
     }
 
     public void changeSpacePressed(boolean b) {
@@ -31,16 +31,21 @@ public class Bird{
         g2.fill(bird);
     }
 
+    // bird falling down
     public void drop() {
         if (y+60 > frame.getHeight()) {
             y = frame.getHeight() - 60;
-        } else {
+        }
+        else {
             y += gravity;
         }
     }
 
+    // bird flying up
     public void fly(long t) {
-        this.y -= (0.1 + yvel*t);
+        if (y > 0) {
+            this.y -= (0.2 + yvel * t);
+        }
     }
 
 }
