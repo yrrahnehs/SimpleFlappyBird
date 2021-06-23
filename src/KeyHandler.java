@@ -14,7 +14,6 @@ public class KeyHandler implements KeyListener {
         if (key == 27) {
             screen.stopGame();
         }
-
         if (key == 32) {
             screen.changePressed(true);
         }

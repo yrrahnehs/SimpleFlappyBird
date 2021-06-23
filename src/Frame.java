@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 
 public class Frame extends JFrame {
 
@@ -16,7 +17,6 @@ public class Frame extends JFrame {
 
         Screen screen = new Screen(this);
         this.add(screen);
-
         this.setVisible(true);
         this.setLocationRelativeTo(null);
     }
