@@ -4,16 +4,15 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Screen extends JPanel implements Runnable {
-    private Frame frame;
+    private final Frame frame;
     private int fps, score;
     private boolean running;
-    int timeheld = 0;
-    int timedrop = 0;
+    private int timeheld = 0;
+    private int timedrop = 0;
 
-    private Bird bird;
-    private Pipe pipe;
+    private final Bird bird;
 
-    ArrayList<Pipe> pipeslist;
+    private final ArrayList<Pipe> pipeslist;
 
     public Screen(Frame frame) {
         Thread thread = new Thread(this);
@@ -22,7 +21,7 @@ public class Screen extends JPanel implements Runnable {
 
         bird = new Bird(frame);
         pipeslist = new ArrayList<Pipe>();
-        pipe = new Pipe(frame);
+        Pipe pipe = new Pipe(frame);
         pipeslist.add(pipe);
 
         fps = 0;
@@ -38,16 +37,18 @@ public class Screen extends JPanel implements Runnable {
         // sets color to green and displays the fps
         g.setColor(Color.GREEN);
         g.drawString("fps: " + fps + "", 10, 20);
-        g.drawString("score: " + score + "",10,40);
+        g.drawString("score: " + score + "", 10, 40);
 
 
         // draws bird
         bird.drawBird(g);
 
+        g.setColor(Color.GREEN);
         // draws pipes
         for (Pipe value : pipeslist) {
             value.drawPipes(g);
         }
+
     }
 
     public void run() {
@@ -88,7 +89,7 @@ public class Screen extends JPanel implements Runnable {
             if (pipeslist.get(0).getX() == frame.getWidth() / 3.0 + 100) {
                 Random random = new Random();
                 Pipe pipe = new Pipe(frame);
-                int randomNumber = random.nextInt((getHeight()-125)+1)+125;
+                int randomNumber = random.nextInt((getHeight() - 125) + 1) + 125;
                 pipe.setY(randomNumber);
                 pipeslist.add(pipe);
             }
@@ -96,13 +97,42 @@ public class Screen extends JPanel implements Runnable {
             if (pipeslist.get(0).getX() == -55) {
                 pipeslist.remove(0);
             }
-            // moves all pipes
+            // moves all pipes to the left of the screen
             for (Pipe value : pipeslist) {
-                value.move(0.5);
+                value.move(0.25);
             }
-            // adds +1 to score once bird passes a pipe
-            if (pipeslist.get(0).getX() == frame.getWidth()/3.0 - 40) {
-                score += 1;
+            // -----------------------------------------------------
+            // +1 to score when bird goes through gap --------------
+            Pipe frontPipe = pipeslist.get(0);
+            if (frontPipe.getY() - frontPipe.getGAP_SIZE() < bird.getY() &&
+                    bird.getY() + bird.getBIRD_HEIGHT() < frontPipe.getY()) {
+                if (frontPipe.getX() + frontPipe.getPIPE_WIDTH() > bird.getX() + bird.getBIRD_WIDTH() &&
+                        frontPipe.getX() < bird.getX()) {
+                    if (bird.getX() + bird.getBIRD_WIDTH() == (frontPipe.getX() + frontPipe.getPIPE_WIDTH()) - 1) {
+                        score++;
+                    }
+                }
+            }
+
+            // collision with the pipes results in exit application -
+            // if bird y is not in gap
+            if (frontPipe.getY() - frontPipe.getGAP_SIZE() > bird.getY() ^
+                    frontPipe.getY() < bird.getY() + bird.getBIRD_HEIGHT()) {
+                // if bird x is in between gap
+                if (frontPipe.getX() + frontPipe.getPIPE_WIDTH() > bird.getX() + bird.getBIRD_WIDTH() &&
+                        frontPipe.getX() < bird.getX()) {
+                    System.exit(0);
+                }
+                // if front of bird hits pipe, and is in between gap
+                if (frontPipe.getX() <= bird.getX() + bird.getBIRD_WIDTH() &&
+                        bird.getX() + bird.getBIRD_WIDTH() <= frontPipe.getX() + frontPipe.getPIPE_WIDTH()) {
+                    System.exit(0);
+                }
+                // if back of bird is between gap
+                if (frontPipe.getX() <= bird.getX() &&
+                        bird.getX() <= frontPipe.getX() + frontPipe.getPIPE_WIDTH()) {
+                    System.exit(0);
+                }
             }
             // -----------------------------------------------------
 
